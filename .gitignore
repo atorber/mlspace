@@ -6,3 +6,4 @@ aihc-python-sdk/.env
 aihc-python-sdk/job-chain/examples/aiak_demo/*.json
 aihc-python-sdk/job-chain/examples/aiak_demo/*.json
 
+aihc-python-sdk/.env

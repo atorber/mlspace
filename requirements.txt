@@ -1,0 +1,2 @@
+bce-python-sdk-next==200.0.9.39
+
