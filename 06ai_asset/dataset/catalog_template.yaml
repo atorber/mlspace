@@ -1,0 +1,67 @@
+dataset:
+  dataset_name: example_customer_events
+  version: "2026.04.0"
+  description: >
+    Canonical customer event dataset used for model training, offline evaluation,
+    and feature backfill jobs.
+  owners:
+    - team: ml-platform
+      contact: ml-platform@example.com
+    - team: data-eng
+      contact: data-eng@example.com
+  source:
+    source_type: object_storage
+    source_url: s3://company-ml/raw/customer-events/
+    upstream_system: event-gateway
+    extraction_job: ingest_customer_events_daily
+  governance:
+    license: internal
+    pii: restricted
+    retention_policy: 365d
+    approval_ticket: DATA-1234
+  storage:
+    storage_uri: s3://company-ml/gold/customer-events/v2026.04.0/
+    file_format: parquet
+    partition_keys:
+      - dt
+    region: cn-bj
+  schema:
+    primary_key:
+      - event_id
+    columns:
+      - name: event_id
+        dtype: string
+        required: true
+      - name: user_id
+        dtype: string
+        required: true
+      - name: event_type
+        dtype: string
+        required: true
+      - name: event_ts
+        dtype: timestamp
+        required: true
+  version_control:
+    strategy: lakefs_or_dvc
+    commit_id: lakefs://customer-events/main/3f57ab2
+    parent_version: "2026.03.2"
+    changelog: "Deduplicated repeated mobile events and normalized timestamps."
+  quality_checks:
+    freshness_sla: "24h"
+    null_threshold:
+      user_id: "0.1%"
+      event_ts: "0%"
+    row_count_expectation:
+      min_rows: 1000000
+      max_rows: 300000000
+    validation_jobs:
+      - customer_events_schema_check
+      - customer_events_dedup_check
+  lineage:
+    raw_location: s3://company-ml/raw/customer-events/
+    processed_location: s3://company-ml/processed/customer-events/
+    gold_location: s3://company-ml/gold/customer-events/
+  consumers:
+    - recommender-training
+    - churn-prediction
+    - customer-analytics

@@ -1,7 +1,8 @@
-# Job Chain
+# 串行任务链工具
 
 ## 简介
-Job-Chain是一个用于管理AIHC任务的工具，它可以帮助用户快速地创建和运行AIHC工作流串行任务。
+
+Job-Chain 是一个用于管理 AIHC 任务的工具，可以帮助用户快速创建并运行 AIHC 工作流中的串行任务。
 
 ## 安装依赖
 
@@ -80,7 +81,7 @@ pip install -r requirements.txt
 从第一个任务开始执行，需要指定任务配置文件的路径，当前一个任务执行完成后，会自动创建下一个任务
 
 ```bash
-python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/job_info/chain_info.json
+python job_chain.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/job_info/chain_info.json
 
 ## 从指定任务开始执行
 
@@ -89,7 +90,7 @@ python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-c
 以下示例为从第二个任务开始创建：
 
 ```bash
-python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/job_info/chain_info.json 1
+python job_chain.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/job_info/chain_info.json 1
 ```
 
 ## 实现原理
@@ -120,42 +121,41 @@ python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-c
 
 - 参数说明
 
-|字段名|值|
-|--|--|
-| MODEL_NAME      | 例如：llama2-7b，在aiak_dict中的models.csv中维护，支持范围参考：https://cloud.baidu.com/doc/AIHC/s/Alyo476jr|
-| REPLICAS        | 实例数量|
-| VERSION         | 版本，自定义本次训练的版本标识，例如：luyc-v4，最终提交到控制台的任务名称拼接为：{MODEL_NAME}-{VERSION}|
-| TRAINING_PHASE  | pretrain、sft|
-| TP              | TP切分策略，必须与PP同时设置，不设置时默认使用AIAK推荐默认切分策略|
-| PP              | PP切分策略，必须与TP同时设置，不设置时默认使用AIAK推荐默认切分策略|
-| DATASET_NAME    | 数据集名称，例如pile_llama_test，在aiak_dict中的datasets.csv中维护|
-| JSON_KEYS       | 数据集中的样本字段，例如text|
-| IMAGE           | AIAK镜像地址 |
+| 字段名 | 值 |
+| --- | --- |
+| `MODEL_NAME` | 例如：`llama2-7b`，在 `aiak_dict/models.csv` 中维护，支持范围参考：[AIHC 文档](https://cloud.baidu.com/doc/AIHC/s/Alyo476jr) |
+| `REPLICAS` | 实例数量 |
+| `VERSION` | 版本，自定义本次训练的版本标识，例如：`luyc-v4`，最终提交到控制台的任务名称会拼接为 `{MODEL_NAME}-{VERSION}` |
+| `TRAINING_PHASE` | `pretrain`、`sft` |
+| `TP` | TP 切分策略，必须与 `PP` 同时设置，不设置时默认使用 AIAK 推荐切分策略 |
+| `PP` | PP 切分策略，必须与 `TP` 同时设置，不设置时默认使用 AIAK 推荐切分策略 |
+| `DATASET_NAME` | 数据集名称，例如 `pile_llama_test`，在 `aiak_dict/datasets.csv` 中维护 |
+| `JSON_KEYS` | 数据集中的样本字段，例如 `text` |
+| `IMAGE` | AIAK 镜像地址 |
 
-2. 生成aiak任务的chain_info.json配置文件
+1. 生成 aiak 任务的 `chain_info.json` 配置文件
 
 ```bash
 # pretrain
-python aiak_parameter_generator.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_pretrain_job_info.json
+python aiak_parameter_generator.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_pretrain_job_info.json
 
 # sft
-python aiak_parameter_generator.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_sft_job_info.json
+python aiak_parameter_generator.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_sft_job_info.json
 ```
 
-格式：python aiak_parameter_generator.py {chain_info_output_path} {aiak_job_info.json}
+格式：`python aiak_parameter_generator.py {chain_info_output_path} {aiak_job_info.json}`
 
--- chain_info_output_path 任务配置信息输出文件目录
+- `chain_info_output_path`：任务配置信息输出目录
+- `aiak_job_info.json`：aiak 任务参数配置文件路径
 
--- aiak_job_info.json aiak任务参数配置文件路径
+1. 使用生成的配置文件提交任务
 
-3. 使用生成的配置文件提交任务
-
-```
+```bash
 # pretrain
-python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_pretrain_chain_info.json
+python job_chain.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_pretrain_chain_info.json
 
 # sft
-python job_chain.py /root/pfs/dev-test/ai-notebook-gallery/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_sft_chain_info.json
+python job_chain.py /root/pfs/dev-test/mlspace/references/sdk/aihc-python-sdk/job-chain/examples/aiak_demo/aiak_sft_chain_info.json
 ```
 
 ### 模型支持
